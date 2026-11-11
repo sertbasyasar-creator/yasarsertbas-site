@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yayınlanmış Çalışmalar | Prof. Dr. Yaşar Sertbaş</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <span class="brand__name">Prof. Dr. Yaşar Sertbaş</span>
+        <span class="brand__role">İç Hastalıkları Uzmanı</span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Menüyü aç/kapat">
+        <span></span>
+      </button>
+      <nav class="nav__menu" id="primary-nav">
+        <ul>
+          <li><a href="index.html">Anasayfa</a></li>
+          <li><a href="hakkinda.html">Hakkında</a></li>
+          <li><a href="yayinlar.html" class="is-active">Yayınlanmış Çalışmalar</a></li>
+          <li><a href="indirilebilir.html">İndirilebilir Çalışmalar</a></li>
+          <li><a href="iletisim.html" class="nav__cta">İletişim</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-header">
+      <div class="container">
+        <p class="eyebrow">Akademik Arşiv</p>
+        <h1>Yayınlanmış Çalışmalar</h1>
+        <p class="lead">Ulusal ve uluslararası hakemli dergilerde yayımlanan makaleler, kitaplar ve bilimsel toplantı sunumları.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <!-- ARAMA VE SIRALAMA ALANI -->
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; align-items: center; justify-content: space-between; background: var(--surface); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
+          <div style="flex: 1; min-width: 250px;">
+            <input type="text" id="pubSearch" placeholder="Başlık, yazar veya dergi ara..." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-sans);">
+          </div>
+          <div style="min-width: 250px;">
+            <select id="pubSort" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-sans); background: white; cursor: pointer;">
+              <option value="year-desc">En yeni yıl (Yeniden eskiye)</option>
+              <option value="year-asc">En eski yıl (Eskiden yeniye)</option>
+              <option value="title-asc">Alfabetik (A-Z)</option>
+              <option value="title-desc">Alfabetik (Z-A)</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- SEKMELER (FİLTRELER) -->
+        <div class="tabs">
+          <button class="tab-btn is-active" data-filter="all">Tümü</button>
+          <button class="tab-btn" data-filter="makale">Makaleler</button>
+          <button class="tab-btn" data-filter="kitap">Kitaplar & Bölümler</button>
+          <button class="tab-btn" data-filter="sunum">Kongre Sunumları</button>
+        </div>
+
+        <!-- YAYIN LİSTESİ (Dinamik olarak JavaScript ile doldurulacak) -->
+        <div class="pub-list" id="pubs-list">
+          <p style="color: var(--muted); text-align: center; padding: 2rem;">Yayınlar yükleniyor...</p>
+        </div>
+        
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="yil"></span> Prof. Dr. Yaşar Sertbaş. Tüm hakları saklıdır.</p>
+      <nav>
+        <ul>
+          <li><a href="hakkinda.html">Hakkında</a></li>
+          <li><a href="yayinlar.html">Yayınlar</a></li>
+          <li><a href="indirilebilir.html">İndirilebilir</a></li>
+          <li><a href="iletisim.html">İletişim</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- SUPABASE VE DİNAMİK LİSTELEME KODU -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const pubsList = document.getElementById('pubs-list');
+      const searchInput = document.getElementById('pubSearch');
+      const sortSelect = document.getElementById('pubSort');
+      const tabBtns = document.querySelectorAll('.tab-btn');
+
+      let allPublications = [];
+      let currentCategory = 'all';
+      let currentSearch = '';
+      let currentSort = 'year-desc';
+
+      // 1. Veritabanından Verileri Çek
+      try {
+        const { data, error } = await supabaseClient
+          .from('publications')
+          .select('*')
+          .order('year', { ascending: false });
+
+        if (error) throw error;
+        allPublications = data || [];
+        renderPublications();
+      } catch (err) {
+        pubsList.innerHTML = `<p style="color: red;">Veriler yüklenirken hata oluştu: ${err.message}</p>`;
+      }
+
+      // 2. Verileri Ekrana Basma (Filtreleme ve Sıralama Dahil)
+      function renderPublications() {
+        // Filtreleme
+        let filtered = allPublications.filter(pub => {
+          const matchesCategory = currentCategory === 'all' || pub.category === currentCategory;
+          const searchString = `${pub.title} ${pub.authors || ''} ${pub.journal || ''} ${pub.year || ''}`.toLowerCase('tr');
+          const matchesSearch = searchString.includes(currentSearch);
+          return matchesCategory && matchesSearch;
+        });
+
+        // Sıralama
+        filtered.sort((a, b) => {
+          if (currentSort === 'year-desc') return (b.year || 0) - (a.year || 0);
+          if (currentSort === 'year-asc') return (a.year || 0) - (b.year || 0);
+          if (currentSort === 'title-asc') return (a.title || '').localeCompare(b.title || '', 'tr');
+          if (currentSort === 'title-desc') return (b.title || '').localeCompare(a.title || '', 'tr');
+          return 0;
+        });
+
+        // HTML'e Dönüştürme
+        if (filtered.length === 0) {
+          pubsList.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 2rem;">Arama kriterlerinize uygun yayın bulunamadı.</p>';
+          return;
+        }
+
+        pubsList.innerHTML = filtered.map(pub => `
+          <article class="pub-item" data-category="${pub.category || 'makale'}">
+            <div class="pub-meta">
+              <span>${pub.year || ''}</span> • <span>${(pub.category || 'makale').toUpperCase()}</span>
+            </div>
+            <h2 class="pub-title">${pub.title}</h2>
+            <p class="pub-authors">${pub.authors || ''}</p>
+            <p class="pub-journal">${pub.journal || ''}</p>
+            <div class="pub-links">
+              ${pub.doi ? `<a href="https://doi.org/${pub.doi}" target="_blank">DOI</a>` : ''}
+              ${pub.pdf_url ? `<a href="${pub.pdf_url}" target="_blank">PDF İndir</a>` : ''}
+            </div>
+          </article>
+        `).join('');
+      }
+
+      // 3. Olay Dinleyicileri (Arama, Sıralama, Sekmeler)
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value.toLowerCase('tr');
+        renderPublications();
+      });
+
+      sortSelect.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        renderPublications();
+      });
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          // Tüm butonlardan aktifliği kaldır
+          tabBtns.forEach(b => b.classList.remove('is-active'));
+          // Tıklanana ekle
+          e.target.classList.add('is-active');
+          // Filtreyi güncelle ve tekrar çiz
+          currentCategory = e.target.getAttribute('data-filter');
+          renderPublications();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
