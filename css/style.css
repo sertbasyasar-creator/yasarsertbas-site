@@ -5,15 +5,15 @@
 
 /* ---------- 1. Değişkenler ---------- */
 :root {
-  --navy-900: #0e1f33;
-  --navy-800: #152b45;
-  --navy-700: #1f3a5f;
-  --navy-500: #3a5a80;
-  --navy-200: #bccfe3;
-  --navy-100: #dde7f2;
-  --navy-50:  #f1f5fa;
+  --navy-900: #064e3b;
+  --navy-800: #065f46;
+  --navy-700: #047857;
+  --navy-500: #10b981;
+  --navy-200: #a7f3d0;
+  --navy-100: #d1fae5;
+  --navy-50:  #ecfdf5;
 
-  --bg:        #faf9f7;
+  --bg:        #f8fafc;
   --surface:   #ffffff;
   --text:      #334155;
   --text-strong:#1e293b;
