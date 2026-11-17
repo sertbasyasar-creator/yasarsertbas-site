@@ -72,8 +72,8 @@
       </div>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button id="btnTabPub" class="btn btn--primary btn--sm" onclick="showTab('pubForm', 'btnTabPub')">Makale Ekle</button>
-        <button id="btnTabFile" class="btn btn--ghost btn--sm" onclick="showTab('fileForm', 'btnTabFile')">Dosya Ekle</button>
+        <button id="btnTabPub" class="btn btn--primary btn--sm" onclick="showTab('pubForm', 'btnTabPub')">Makale/Yayın Ekle</button>
+        <button id="btnTabFile" class="btn btn--ghost btn--sm" onclick="showTab('fileForm', 'btnTabFile')">Dosya/Sunum Ekle</button>
         <button id="btnTabNews" class="btn btn--ghost btn--sm" onclick="showTab('newsForm', 'btnTabNews')">Haber Ekle</button>
         <button id="btnTabHero" class="btn btn--ghost btn--sm" onclick="showTab('heroForm', 'btnTabHero')">Ana Sayfa İçeriği Ekle</button>
         <button id="btnTabManage" class="btn btn--ghost btn--sm" onclick="showTab('manageForm', 'btnTabManage')">İçerikleri Yönet / Sil</button>
@@ -171,10 +171,10 @@
       <!-- Filtre Butonları -->
       <div class="filter-bar">
         <button class="filter-btn active" onclick="filterManageList('all', this)">Tümü</button>
-        <button class="filter-btn" onclick="filterManageList('publications', this)">Yayın / Makale</button>
-        <button class="filter-btn" onclick="filterManageList('hero_content', this)">Slider İçeriği</button>
-        <button class="filter-btn" onclick="filterManageList('news', this)">Haber</button>
-        <button class="filter-btn" onclick="filterManageList('downloads', this)">Dosya</button>
+        <button class="filter-btn" onclick="filterManageList('publications', this)">Yayın / Makale İçeriği</button>
+        <button class="filter-btn" onclick="filterManageList('hero_content', this)">Ana Sayfa İçeriği</button>
+        <button class="filter-btn" onclick="filterManageList('news', this)">Haber İçeriği</button>
+        <button class="filter-btn" onclick="filterManageList('downloads', this)">Dosya/Sunum İçeriği</button>
       </div>
 
       <input type="text" id="manageSearch" class="admin-input" placeholder="Başlık ile ara..." style="margin-bottom: 15px;">
